@@ -30,7 +30,7 @@ class PowerLASCOPFInputData:
     """A class to abstract the dataframes for PowerLASCOPF output files."""
 
     tag: str
-    folder: Path
+    folder: Union[str, Path]
     file_name: str
     dataframe: pd.DataFrame
 
