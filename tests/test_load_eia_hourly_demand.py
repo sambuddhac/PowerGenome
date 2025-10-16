@@ -10,9 +10,7 @@ import pandas as pd
 import pytest
 
 # Import functions from the script
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent / "powergenome" / "scripts" / "powerlascopf_data_helpers"))
-from load_eia_hourly_demand import (
+from powergenome.scripts.powerlascopf_data_helpers.load_eia_hourly_demand import (
     parse_eia_timestamp,
     read_csv_file,
     read_json_file,
