@@ -347,12 +347,27 @@ def convert_network_to_lascopf(
     
     # Extract from_bus and to_bus from Network_Lines or z columns
     if "line_name" in lascopf_network.columns:
-        # Typical format: "z1_z2" or similar
-        lascopf_network[["from_bus", "to_bus"]] = (
-            lascopf_network["line_name"]
-            .str.extract(r"z?(\d+).*z?(\d+)")
-            .astype(float)
+        # Try to extract from_bus and to_bus from line_name using robust regex patterns
+        # Handles formats like "z1_z2", "z1z2", "bus1_bus2", "bus1-bus2", etc.
+        extract_df = lascopf_network["line_name"].str.extract(
+            r"(?:(?:z|bus)?(\d+)[_\- ]*(?:z|bus)?(\d+))", expand=True
         )
+        extract_df = extract_df.astype(float)
+        # If extraction fails (NaN), try fallback to z1/z2 columns or log a warning
+        if extract_df.isnull().any(axis=None):
+            logger.warning(
+                "Could not reliably extract from_bus and to_bus from some line_name values. "
+                "Falling back to z1/z2 columns if available."
+            )
+            if "z1" in lascopf_network.columns and "z2" in lascopf_network.columns:
+                lascopf_network["from_bus"] = lascopf_network["z1"]
+                lascopf_network["to_bus"] = lascopf_network["z2"]
+            else:
+                raise ValueError(
+                    "Failed to extract from_bus and to_bus from line_name, and z1/z2 columns are not available."
+                )
+        else:
+            lascopf_network[["from_bus", "to_bus"]] = extract_df
     elif "z1" in lascopf_network.columns and "z2" in lascopf_network.columns:
         lascopf_network["from_bus"] = lascopf_network["z1"]
         lascopf_network["to_bus"] = lascopf_network["z2"]
