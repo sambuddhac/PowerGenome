@@ -251,7 +251,7 @@ def convert_branches(net):
                 # vkr_percent is the real part
                 r_pu = (
                     (trafo["vkr_percent"] / 100)
-                    if trafo.get("vkr_percent", 0) > 0
+                    if pd.notna(trafo["vkr_percent"])
                     else 0
                 )
                 x_pu_sq = (trafo["vk_percent"] / 100) ** 2 - r_pu**2
