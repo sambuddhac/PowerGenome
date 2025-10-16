@@ -75,7 +75,7 @@ def parse_eia_timestamp(timestamp_str: str) -> pd.Timestamp:
         
     except Exception as e:
         logger.error(f"Could not parse timestamp '{timestamp_str}': {e}")
-        raise
+        raise ValueError(f"Could not parse timestamp '{timestamp_str}': {e}") from e
 
 
 def read_csv_file(file_path: Union[str, Path]) -> pd.DataFrame:
