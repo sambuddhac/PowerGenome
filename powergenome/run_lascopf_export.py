@@ -182,7 +182,7 @@ def main(**kwargs):
     else:
         zone_num_map = {}
     
-    logger.info(f"Found {len(scenario_settings)} scenarios to process")
+    logger.info("Found %d scenarios to process", len(scenario_settings))
     
     # Process each scenario
     for scenario, _settings in scenario_settings.items():
