@@ -121,7 +121,7 @@ def read_csv_file(file_path: Union[str, Path]) -> pd.DataFrame:
         
     except Exception as e:
         logger.error(f"Error reading CSV file {file_path}: {e}")
-        raise
+        raise RuntimeError(f"Failed to read CSV file {file_path}: {e}") from e
 
 
 def read_json_file(file_path: Union[str, Path]) -> pd.DataFrame:
