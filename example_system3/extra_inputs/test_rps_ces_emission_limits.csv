@@ -1,0 +1,4 @@
+﻿case_id,year,region,ESR_1,ESR_2,CO_2_Cap_Zone_1,CO_2_Max_Mtons_1,CO_2_Max_tons_MWh_1,CapRes_1,copy_case_id
+p1,2040,USA_Single,0.5,1,0,-1,-1,0.156,
+p2,2040,USA_Single,0.5,1,0,-1,-1,0.156,
+p3,2040,USA_Single,0.45,0.9,0,-1,0.1,0.156,

@@ -10,17 +10,17 @@
 # profiles, etc
 # - "model_first_planning_year": The first year of each planning period. Capex for
 # new-build generators from ATB are an average of costs from first to last (inclusive).
-model_year: [2040]
-model_first_planning_year: [2020]
+model_year: [2050]
+model_first_planning_year: [2030]
 
 
 # The location and name of additional input files needed to create outputs
 input_folder: extra_inputs # Subfolder directly below the location of this settings file
 case_id_description_fn: test_case_id_description.csv # Match the case_id with longer case_name
 #scenario_definitions_fn: test_scenario_inputs_short.csv # Define policy/cost scenarios for each case
-scenario_definitions_fn: test_scenario_inputs.csv # Define policy/cost scenarios for each case ##Needed for FLECCS
-distributed_gen_profiles_fn: test_dg_profiles.csv # Hourly profiles of distributed gen by region
-#demand_response_fn: test_ev_load_shifting.csv # Load profiles of DR resources by model_year and scenario ##Uncomment and repplace the filename with ~ if problem
+scenario_definitions_fn: test_scenario_inputs_fleccs.csv # Define policy/cost scenarios for each case ##Needed for FLECCS
+distributed_gen_profiles_fn: test_dg_profiles.csv # Hourly profiles of distributed gen by region ## To address negative loads
+demand_response_fn: test_ev_load_shifting.csv # Load profiles of DR resources by model_year and scenario ##Uncomment and repplace the filename with ~ if problem
 emission_policies_fn: test_rps_ces_emission_limits.csv # Emission policies for each model_year/region/case_id
 capacity_limit_spur_fn: test_resource_capacity_spur.csv # Max capacity and spur line distance for each renewable resource
 region_wind_pv_cap_fn: existing_wind_pv_capacity.csv
@@ -58,7 +58,7 @@ distributed_gen_method:
 # in "distributed_gen_method". These can be varied by scenario by adding them to an
 # associated scenario in "settings_management".
 distributed_gen_values:
-  2040:
+  2050:
     USA_Single: 111418 #We need to change it for FLECCS ; Getting the numbers from the NREL ReEDS mid-case scenario
 
 
@@ -68,14 +68,14 @@ avg_distribution_loss: 0.0453
 # Name of the DSM resource, fraction of load that can be shifted, and number of hours
 # that it can be shifted
 demand_response_resources:
-  2040:
+  2050:
     ev_load_shifting:
-      fraction_shiftable: 0.8
+      fraction_shiftable: 1
       parameter_values:
         Max_Flexible_Demand_Delay: 5
         FLEX: 1
         Flexible_Demand_Energy_Eff: 1
-demand_response: 'moderate'
+demand_response: 'current'
 
 # Transmission financial information to calculate annual investment costs
 # capex_mw_mile: Capital cost per MW-mile for all (numeric) or each model region (dict).
@@ -121,7 +121,14 @@ partial_ces: false
 # parameter from this settings file with a value that should be modified for a specific
 # case.
 settings_management:
-  2040:
+  2050:
+    aeo_reference:
+      yes:
+        regional_load_fn: ~
+        demand_response_fn: ~
+      no:
+        regional_load_fn: test_regional_load_profiles.csv
+        demand_response_fn: test_ev_load_shifting.csv
     ng_price:
       reference:
         aeo_fuel_scenarios:
@@ -164,16 +171,16 @@ settings_management:
             tech_detail: CCS100
             capex_mw: [mul, 1.2]
     renewable_capex:
-      mid:
+      conservative:
         atb_new_gen:
           - [NaturalGas, CCCCSAvgCF, Mid, 500]
           - [NaturalGas, CCAvgCF, Mid, 500]
           - [NaturalGas, CTAvgCF, Mid, 100]
-          - [LandbasedWind, LTRG1, Mid, 1]
-          - [OffShoreWind, OTRG10, Mid, 1]
-          - [UtilityPV, LosAngeles, Mid, 1]
-          - [Battery, "*", Mid, 1]
-      low:
+          - [LandbasedWind, LTRG1, Low, 1]
+          - [OffShoreWind, OTRG10, Low, 1]
+          - [UtilityPV, LosAngeles, Low, 1]
+          - [Battery, "*", High, 1]
+      enhanced:
         atb_new_gen:
           - [NaturalGas, CCCCSAvgCF, Mid, 500]
           - [NaturalGas, CCAvgCF, Mid, 500]
@@ -182,13 +189,43 @@ settings_management:
           - [OffShoreWind, OTRG10, Low, 1]
           - [UtilityPV, LosAngeles, Low, 1]
           - [Battery, "*", Low, 1]
-    nuclear_capex:
-      mid:
-        additional_new_gen:
-          - Nuclear_mid
-      low:
-        additional_new_gen:
-          - Nuclear_low
+      reference:
+        atb_new_gen:
+          - [NaturalGas, CCCCSAvgCF, Mid, 500]
+          - [NaturalGas, CCAvgCF, Mid, 500]
+          - [NaturalGas, CTAvgCF, Mid, 100]
+          - [LandbasedWind, LTRG1, Mid, 1]
+          - [OffShoreWind, OTRG10, Mid, 1]
+          - [UtilityPV, LosAngeles, Mid, 1]
+          - [Battery, "*", Mid, 1]
+    nuclear_availability:
+      available:
+        model_tag_values:
+          New_Build:
+            Nuclear_*: 1
+      not_available:
+        model_tag_values:
+          New_Build:
+            Nuclear_*: 0
+    #battery_capex:
+      #moderate:
+       # atb_new_gen:
+        #  - [NaturalGas, CCCCSAvgCF, Mid, 500]
+         # - [NaturalGas, CCAvgCF, Mid, 500]
+          #- [NaturalGas, CTAvgCF, Mid, 100]
+          #- [LandbasedWind, LTRG1, Mid, 1]
+          #- [OffShoreWind, OTRG10, Mid, 1]
+          #- [UtilityPV, LosAngeles, Mid, 1]
+          #- [Battery, "*", Mid, 1]
+      #enhanced:
+       # atb_new_gen:
+        #  - [NaturalGas, CCCCSAvgCF, Mid, 500]
+         # - [NaturalGas, CCAvgCF, Mid, 500]
+          #- [NaturalGas, CTAvgCF, Mid, 100]
+          #- [LandbasedWind, LTRG1, Low, 1]
+          #- [OffShoreWind, OTRG10, Low, 1]
+          #- [UtilityPV, LosAngeles, Low, 1]
+          #- [Battery, "*", Low, 1]
 
 
 ###########################################
@@ -202,7 +239,7 @@ settings_management:
 data_years:
   - 2018
 
-target_usd_year: 2019
+target_usd_year: 2020 ##If I get any CPI error, change it back to 2019
 
 # HOURS OFFSET FROM UTC
 # All time profile data are stored in UTC. Provide an offset for the model timezone.
@@ -245,7 +282,7 @@ cluster_method: kmeans
 num_clusters:
   Conventional Steam Coal: 10
   Natural Gas Fired Combined Cycle: 8
-  Natural Gas Fired Combustion Turbine: 6
+  Natural Gas Fired Combustion Turbine: 2 #6
   Nuclear: 1
   Conventional Hydroelectric: 1
   Wood/Wood Waste Biomass: 1
@@ -322,36 +359,36 @@ derate_techs:
 # RETIREMENT AGES
 # The age at which each technolgy type is expected to retire
 
-retirement_ages:
-  Conventional Hydroelectric: 500
-  Small Hydroelectric: 500
-  Conventional Steam Coal: 60
-  Natural Gas Fired Combined Cycle: 40
-  Natural Gas Fired Combustion Turbine: 40
-  Petroleum Liquids: 40
-  Natural Gas Internal Combustion Engine: 40
-  Nuclear: 60
-  Onshore Wind Turbine: 30
-  Hydroelectric Pumped Storage: 500
-  Natural Gas Steam Turbine: 40
-  Solar Photovoltaic: 40
-  Solar Thermal without Energy Storage: 40
-  Geothermal: 100
-  Municipal Solid Waste: 40
-  Landfill Gas: 40
-  Batteries: 40
-  Wood/Wood Waste Biomass: 40
-  Petroleum Coke: 40
-  All Other: 40
-  Natural Gas with Compressed Air Storage: 40
-  Coal Integrated Gasification Combined Cycle: 40
-  Other Waste Biomass: 40
-  Other Gases: 40
-  Other Natural Gas: 40
-  Solar Thermal with Energy Storage: 40
-  Flywheels: 40
-  Offshore Wind Turbine: 30
-  Hydrokinetic: 40
+retirement_ages: ##Keep the 2030 run new-builds but retire everything else
+  Conventional Hydroelectric: 1 #500
+  Small Hydroelectric: 1 #500
+  Conventional Steam Coal: 1 #60
+  Natural Gas Fired Combined Cycle: 1 #40
+  Natural Gas Fired Combustion Turbine: 1 #40
+  Petroleum Liquids: 1 #40
+  Natural Gas Internal Combustion Engine: 1 #40
+  Nuclear: 1 #60
+  Onshore Wind Turbine: 1 #30
+  Hydroelectric Pumped Storage: 1 #500
+  Natural Gas Steam Turbine: 1 #40
+  Solar Photovoltaic: 1 #40
+  Solar Thermal without Energy Storage: 1 #40
+  Geothermal: 1 #100
+  Municipal Solid Waste: 1 #40
+  Landfill Gas: 1 #40
+  Batteries: 1 #40
+  Wood/Wood Waste Biomass: 1 #40
+  Petroleum Coke: 1 #40
+  All Other: 1 #40
+  Natural Gas with Compressed Air Storage: 1 #40
+  Coal Integrated Gasification Combined Cycle: 1 #40
+  Other Waste Biomass: 1 #40
+  Other Gases: 1 #40
+  Other Natural Gas: 1 #40
+  Solar Thermal with Energy Storage: 1 #40
+  Flywheels: 1 #40
+  Offshore Wind Turbine: 1 #30
+  Hydrokinetic: 1 #40
 
 
 # CLUSTER TAGS
@@ -376,6 +413,7 @@ model_tag_names:
   - CapRes_1
   - Hydro_Energy_to_Power_Ratio
   - MinCapTag_1
+  - MinCapTag_2
   - Reg_Max
   - Rsv_Max
 
@@ -405,6 +443,8 @@ model_tag_values:
     Petroleum Coke: 1
     Petroleum Liquids: 1
     Wood/Wood Waste Biomass: 1
+    naturalgas: 1
+    netl_ngcc: 1
   VRE:
     CSP: 1
     LandbasedWind: 1
@@ -528,14 +568,14 @@ atb_cap_recovery_years: 20
 # the annual investment costs. The names are matched using str.contains rather than
 # exact matches. Set parameter value to none (~) if not used.
 alt_atb_cap_recovery_years:
-  NaturalGas_CCAvg: 15
-  NaturalGas_CTAvg: 15
   Battery: 15
   Nuclear: 40
+  netl_ngcc_CCS: 20 ##Book life of the netl_ngcc_CCS technology
+  NETL_NGCC: 20 ##Book life of the NETL_NGCC technology
 
 # The year of NREL ATB data to use for matching existing generators (O&M costs)
 atb_existing_year: 2018
-atb_usd_year: 2017 # From Capex figure in atb documentation https://atb.nrel.gov/electricity/2019/summary.html
+atb_usd_year: 2019 # From Capex figure in atb documentation https://atb.nrel.gov/electricity/2019/summary.html
 
 # ATB uses an average of conventional and advanced techs. We only want advanced. To use
 # standard ATB values set multipliers to 1.
@@ -558,6 +598,20 @@ atb_modifiers:
     Var_OM_Cost_per_MWh: [mul, 0.73]
     Fixed_OM_Cost_per_MWyr: [mul, 0.95]
     Heat_Rate_MMBTU_per_MWh: [mul, 0.98]
+  netl_ngcc_CCS:
+    technology: NaturalGas
+    tech_detail: CCCCSAvgCF
+    capex_mw: [mul, 1.15]
+    Var_OM_Cost_per_MWh: [mul, 1.01]
+    Fixed_OM_Cost_per_MWyr: [mul, 2.44]
+    Heat_Rate_MMBTU_per_MWh: [mul, 0.95]
+  NETL_NGCC:
+    technology: NaturalGas
+    tech_detail: CCAvgCF
+    capex_mw: [mul, 1.04]
+    Var_OM_Cost_per_MWh: [mul, 0.81]
+    Fixed_OM_Cost_per_MWyr: [mul, 2.15]
+    Heat_Rate_MMBTU_per_MWh: [mul, 0.99]
 
 
 # Copy and modify an existing ATB new generator. This takes place BEFORE the ATB CC/CT
@@ -626,7 +680,7 @@ additional_new_gen:
   # - Nuclear_mid
   # - NGCCS100_mid
   - NETL_NGCC
-  - NETL_NGCC_CCS
+  - netl_ngcc_CCS
 
 
 # Dictionary of lists with model region as key and ATB tech (string matching) in list
@@ -706,7 +760,7 @@ cost_multiplier_technology_map:
   CT - industrial frame: [NaturalGas_CTAvgCF, NaturalGas_CTHighCF]
   CC - single shaft: []
   CC - multi shaft: [NaturalGas_CCAvgCF, NaturalGas_CCHighCF, NETL_NGCC] ##FLECCS Related change
-  CC with 90% CCS: [NaturalGas_CCCCSAvgCF, NaturalGas_CCCCSHighCF, NGCCS100, NaturalGas_CCS100, NaturalGas_CCS100_low,NaturalGas_CCS100_high, NETL_NGCC_CCS ] ##FLECCS Related change
+  CC with 90% CCS: [NaturalGas_CCCCSAvgCF, NaturalGas_CCCCSHighCF, NGCCS100, NaturalGas_CCS100, NaturalGas_CCS100_low,NaturalGas_CCS100_high, netl_ngcc_CCS ] ##FLECCS Related change
   Fuel cells: []
   Advanced nuclear: [Nuclear_*, Nuclear_mid, Nuclear_low, Nuclear_high]
   Biomass: [Biopower_CofireOld, Biopower_CofireNew, Biopower_Dedicated]
@@ -1009,8 +1063,8 @@ additional_planned: ~
 # Load from IPM is for 2011. The growth rates from 2011-2018 can be calculated using
 # historical data
 default_load_year: 2012
-regular_load_growth_start_year: 2019
-growth_scenario: REF2020
+regular_load_growth_start_year: 2020 #2019
+growth_scenario: REF2021
 
 historical_load_region_maps:
   TRE: [ERC_PHDL, ERC_REST, ERC_WEST]
@@ -1031,8 +1085,8 @@ historical_load_region_maps:
   RFCET: [PJM_WMAC, PJM_EMAC, PJM_SMAC, PJM_PENE, PJM_Dom]
   RFCMI: [MIS_LMI]
   RFCWT: [PJM_West, PJM_AP, PJM_ATSI, PJM_COMD]
-  SERCDLT: [MIS_WOTA, MIS_LA, MIS_AMSO, MIS_AR]
-  SERCGW: [MIS_MO, S_D_AECI, MIS_IL, MIS_INKY]
+  SERCDLT: [MIS_WOTA, MIS_LA, MIS_AMSO, MIS_AR, MIS_D_MS]
+  SERCGW: [MIS_MO, S_D_AECI, MIS_IL, MIS_INKY, USA_Single]
   SERCSOES: [S_SOU]
   SERCCNT: [S_C_TVA, S_C_KY]
   SERCVC: [S_VACA]
@@ -1115,12 +1169,12 @@ eia_series_fuel_names:
 
 # Which year of AEO to use. Note that different years have different scenario names
 # so those may need to be modified accordingly.
-eia_aeo_year: 2020
+eia_aeo_year: 2021
 
 # This is a subset of AEO 2020 scenarios. For a full list, look at the eia open data
 # page https://www.eia.gov/opendata/qb.php?category=3604304
 eia_series_scenario_names:
-  reference: REF2020
+  reference: REF2021
   low_price: LOWPRICE
   high_price: HIGHPRICE
   high_resource: HIGHOGS
@@ -1148,7 +1202,7 @@ tech_fuel_map:
 # where the fuel matches something from "aeo_fuel_scenarios" (above
 # ATB: technology_tech_detail.
 ccs_fuel_map:
-  NETL_NGCC_CCS: naturalgas_ccs90 ##FLECCS Related change
+  netl_ngcc_CCS: naturalgas_ccs90 ##FLECCS Related change
   NaturalGas_CCS100: naturalgas_ccs100
   NaturalGas_CCCCS: naturalgas_ccs90
   Coal_CCS30: coal_ccs30
@@ -1240,6 +1294,7 @@ generator_columns: [
             # "HEAT",
             # "NACC",
             # "TRADER",
+            "waccreal",
             "HYDRO",
             "ESR_1",
             "ESR_2",

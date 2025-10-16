@@ -1,0 +1,4 @@
+case_id,year,ng_price,renewable_capex,electrification,nuclear_availability,demand_response,aeo_reference
+p1,2050,low,conservative,high,not_available,current,no
+p2,2050,high,advanced,reference,available,enhanced,no
+p3,2050,reference,reference,reference,available,current,yes
