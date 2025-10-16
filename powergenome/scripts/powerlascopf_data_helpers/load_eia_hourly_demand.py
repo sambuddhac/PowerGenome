@@ -416,7 +416,7 @@ Examples:
         logger.info("Conversion completed successfully")
     except Exception as e:
         logger.error(f"Conversion failed: {e}")
-        raise
+        raise RuntimeError("Conversion failed during EIA hourly demand data processing") from e
 
 
 if __name__ == "__main__":
