@@ -41,7 +41,7 @@ def load_pandapower_network(input_file):
             # Try pandapower's from_pickle first
             try:
                 net = pp.from_pickle(str(input_path))
-            except:
+            except (pickle.UnpicklingError, AttributeError, OSError) as e:
                 # Fall back to direct pickle load
                 with open(input_path, "rb") as f:
                     net = pickle.load(f)
