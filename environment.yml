@@ -5,7 +5,6 @@ channels:
 dependencies:
   - python=3.10 # Remove for tox.ini & setup.py
   - pip
-  - conda-forge::catalystcoop.pudl=2022.11.30
   - jupyterlab
   - black
   - pytest
@@ -24,8 +23,11 @@ dependencies:
   - openpyxl>=3.0
   - duckdb
 
-  # GIS dependencies from conda-forge
+  # GIS dependencies from conda-forge (except geopandas - handled by pip)
   - conda-forge::fiona
-  - conda-forge::geopandas>=0.12
   - conda-forge::pyogrio
   - conda-forge::shapely
+
+  # Install via pip for better dependency resolution
+  - pip:
+    - geopandas>=0.12
