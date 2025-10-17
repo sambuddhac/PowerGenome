@@ -119,7 +119,7 @@ A series of example notebooks are included in [`PowerGenome/notebooks`](/noteboo
 
 ### Command line interface
 
-The outputs are all formatted for GenX we hope to make the data formatting code more module to allow users to easily switch between outputs for different power system models.
+The default outputs are formatted for GenX. PowerGenome also supports export to other power system models including PowerLASCOPF.jl for AC optimal power flow analysis. See the [PowerLASCOPF export documentation](docs/PowerLASCOPF_quickstart.md) for details.
 
 Functions from each module can be imported and used in an interactive environment (e.g. JupyterLab). Examples of how to load data in this way are included in `PowerGenome/notebooks`. To run from the command line, navigate to a project folder that contains a settings file and extra inputs (e.g. `myproject/powergenome`), activate the  `powergenome` conda environment, and use the command `run_powergenome_multiple` with flags for the settings file name and where the results should be saved. Since the `powergenome` package is installed in the `powergenome` conda environment, you can run the command line function from anywhere on your computer (not just within the cloned `PowerGenome` folder).
 
@@ -127,10 +127,17 @@ Functions from each module can be imported and used in an interactive environmen
 run_powergenome_multiple --settings_file settings --results_folder test_system
 ```
 
+For PowerLASCOPF.jl export:
+
+```sh
+python -m powergenome.run_lascopf_export --settings_file settings --results_folder lascopf_output
+```
+
 The command line arguments `--settings_file` and `--results_folder` can be shortened to `-sf` and `-rf` respectively. For all options, run:
 
 ```sh
 run_powergenome_multiple --help
+python -m powergenome.run_lascopf_export --help
 ```
 
 A folder with extra user inputs is required when using the `run_powergenome_multiple` command. The name of this folder is defined in the settings YAML file with the `input_folder` parameter. Look at the files in each example system for test cases to follow.

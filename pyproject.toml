@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "catalystcoop.pudl>=0.6.0, <=2022.11.30",
+    "catalystcoop.pudl>=0.6.0",
     "beautifulsoup4 >= 4.8.13",
     "statsmodels>=0.12.2",
     "python-dotenv",
@@ -35,7 +35,7 @@ dependencies = [
     "pyyaml",
     "frozendict",
     "openpyxl>=3.0",
-    "geopandas>=0.12",
+    "geopandas>=0.9,<0.11",
     "pyogrio",
     "xlrd",
     "pyarrow",
