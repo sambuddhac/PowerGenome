@@ -1,14 +1,14 @@
 pytest
 pandas>=0.24
 beautifulsoup4
-geopandas
+geopandas>=0.12
 sklearn
 xlrd
 requests
 pyyaml
 pyarrow
 python-dotenv
-catalystcoop.pudl
+catalystcoop.pudl>=2023.12.1
 cpi
 flatten-dict
 pre-commit

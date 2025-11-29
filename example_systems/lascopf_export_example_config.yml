@@ -1,0 +1,171 @@
+# PowerLASCOPF Export Example Configuration
+
+# This example shows optional PowerLASCOPF-specific parameters that can be added
+# to your existing PowerGenome settings file. All parameters shown here are optional
+# and have sensible defaults.
+
+# Your existing PowerGenome settings work without modification for basic export.
+# Add these sections only if you need to customize electrical parameters.
+
+# Optional: Custom PowerLASCOPF parameters
+lascopf_custom_params:
+  
+  # Base system parameters
+  base_voltage_kv: 345.0  # Default transmission voltage level (kV)
+  power_factor: 0.95      # Default power factor for load Q calculation
+  
+  # Voltage limits (per unit)
+  voltage_limits:
+    vmax: 1.05  # Maximum voltage (5% above nominal)
+    vmin: 0.95  # Minimum voltage (5% below nominal)
+  
+  # Custom line electrical parameters
+  # Use this to override calculated line impedances with actual values
+  line_parameters:
+    # Line name (from Network_Lines column)
+    CA_N_to_CA_S:
+      r: 0.0015       # Resistance (per unit)
+      x: 0.015        # Reactance (per unit)
+      b: 0.025        # Line charging susceptance (per unit)
+      rate_a: 5000.0  # Normal MVA rating
+      rate_b: 5500.0  # Short-term MVA rating
+      rate_c: 6000.0  # Emergency MVA rating
+    
+    # Add more lines as needed
+    # AZ_to_NM:
+    #   r: 0.0012
+    #   x: 0.012
+    #   b: 0.020
+    #   rate_a: 2000.0
+  
+  # Custom bus voltage levels
+  # Override default 345 kV for specific buses/zones
+  bus_voltages:
+    1: 345.0  # Zone 1 at 345 kV
+    2: 500.0  # Zone 2 at 500 kV (higher voltage transmission)
+    3: 230.0  # Zone 3 at 230 kV (lower voltage)
+  
+  # Custom generator reactive power limits
+  # Override default ±30% of active power capacity
+  gen_q_limits:
+    # Generator Resource name
+    Coal_CA_1:
+      qg_min: -100.0  # Minimum reactive power (MVAr)
+      qg_max: 200.0   # Maximum reactive power (MVAr)
+    
+    # Synchronous condensers (for voltage support)
+    SynCon_1:
+      qg_min: -150.0
+      qg_max: 150.0
+  
+  # Transformer parameters for specific connections
+  # Use when lines represent transformers between voltage levels
+  transformer_parameters:
+    z1_to_z2:  # Line connecting zones at different voltages
+      tap_ratio: 1.02      # Off-nominal tap ratio
+      shift_angle: 0.0     # Phase shift (degrees)
+      is_transformer: true # Flag to identify as transformer
+  
+  # Angle difference limits (degrees)
+  angle_limits:
+    angmin: -30.0  # Maximum negative angle difference
+    angmax: 30.0   # Maximum positive angle difference
+  
+  # Generator unit commitment parameters
+  # Override defaults for specific technologies
+  uc_parameters:
+    Coal:
+      min_up_time: 8      # Minimum hours online
+      min_down_time: 8    # Minimum hours offline
+      startup_cost_multiplier: 1.0  # Adjust startup costs
+    
+    NGCC:
+      min_up_time: 4
+      min_down_time: 4
+      startup_cost_multiplier: 1.0
+    
+    NGCT:
+      min_up_time: 1
+      min_down_time: 1
+      startup_cost_multiplier: 1.0
+  
+  # Cost function type
+  # Options: 'linear' (default), 'quadratic', 'piecewise'
+  cost_function_type: 'linear'
+  
+  # For quadratic cost functions, specify c2 coefficients
+  # Format: {technology: c2_value}
+  quadratic_costs:
+    Coal: 0.00005    # $/MW^2
+    NGCC: 0.00003
+    NGCT: 0.00008
+  
+  # Network topology flags
+  network_options:
+    include_isolated_buses: false  # Drop buses with no connections
+    minimum_line_capacity: 50.0    # Drop lines below this capacity (MW)
+    enforce_radial: false           # Check for radial connections
+  
+  # Output format options
+  output_options:
+    use_zero_indexing: false  # Use 1-based indexing (Julia default)
+    decimal_precision: 4      # Number of decimal places in output
+    include_metadata: true    # Add metadata comments to CSV files
+
+
+# Example: Integrating with external data sources
+# Uncomment and customize for your use case
+
+# external_network_data:
+#   # Path to CSV with detailed electrical parameters
+#   detailed_network_file: "path/to/detailed_network.csv"
+#   
+#   # Merge strategy: 'override' or 'supplement'
+#   # 'override': Use external data when available
+#   # 'supplement': Use external data only for missing values
+#   merge_strategy: 'override'
+
+# external_generator_data:
+#   # Path to CSV with generator-specific parameters
+#   generator_params_file: "path/to/generator_params.csv"
+#   
+#   # Columns to merge from external file
+#   merge_columns:
+#     - qg_min
+#     - qg_max
+#     - startup_cost
+#     - shutdown_cost
+
+# matpower_case:
+#   # Import base network from MATPOWER case
+#   case_file: "path/to/case118.mat"
+#   
+#   # Use MATPOWER topology and electrical parameters
+#   use_topology: true
+#   use_impedances: true
+#   use_ratings: true
+#   
+#   # Map PowerGenome zones to MATPOWER buses
+#   zone_to_bus_mapping:
+#     1: [1, 2, 3, 4]    # Zone 1 maps to buses 1-4
+#     2: [5, 6, 7, 8]    # Zone 2 maps to buses 5-8
+
+
+# Notes:
+# ------
+# 1. All parameters in this file are OPTIONAL. Default values provide
+#    reasonable starting points for most applications.
+#
+# 2. For production-quality AC OPF studies, you should obtain actual
+#    electrical parameters from:
+#    - Utility planning models
+#    - Regional transmission organizations (RTOs)
+#    - FERC Form 715 data
+#    - WECC/ERCOT planning cases
+#
+# 3. The default parameters are based on typical transmission system
+#    characteristics and may not accurately represent your specific
+#    study region.
+#
+# 4. See the full PowerLASCOPF export guide for detailed explanations:
+#    docs/PowerLASCOPF_export_guide.md
